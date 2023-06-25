@@ -1,46 +1,56 @@
-import React, { useState } from 'react';
-import {
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableNativeFeedback,
-  TouchableHighlight,
-  TouchableWithoutFeedback,
-  Text,
-} from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function App() {
-  const [count, setCount] = useState(0);
+  function onPressHandle() {
+    console.log('onPressHandle');
+  }
 
+  function onPressOutHandle() {
+    console.log('onPressOutHandle');
+  }
+
+  function onPressInHandle() {
+    console.log('onPressInHandle');
+  }
+
+  function onLongPressHandle() {
+    console.log('onLongPressHandle');
+  }
   return (
     <View style={styles.container}>
-      <TouchableHighlight
-        style={styles.touchableStyle}
-        onPress={() => setCount(count + 1)}
+      <Pressable
+        style={({ pressed }) => {
+          if (pressed) {
+            return styles.pressdStyle;
+          } else {
+            return styles.unPressdStyle;
+          }
+        }}
+        hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
+        onPress={onPressHandle}
+        onPressIn={onPressInHandle}
+        onPressOut={onPressOutHandle}
+        onLongPress={onLongPressHandle}
       >
-        <Text style={styles.txtStyle}>点击加1</Text>
-      </TouchableHighlight>
-
-      <TouchableOpacity
-        style={styles.touchableStyle}
-        onPress={() => setCount(count + 1)}
-      >
-        <Text style={styles.txtStyle}>点击加1</Text>
-      </TouchableOpacity>
-
-      <TouchableWithoutFeedback onPress={() => setCount(count + 1)}>
-        <View style={styles.touchableStyle}>
-          <Text style={styles.txtStyle}>点击加1</Text>
-        </View>
-      </TouchableWithoutFeedback>
-
-      <TouchableNativeFeedback onPress={() => setCount(count + 1)}>
-        <View style={styles.touchableStyle}>
-          <Text style={styles.txtStyle}>点击加1</Text>
-        </View>
-      </TouchableNativeFeedback>
-
-      <Text style={[styles.countText]}>{count !== 0 ? count : null}</Text>
+        {({ pressed }) => {
+          // 根据是否点按返回不同的子组件
+          if (pressed) {
+            return (
+              <Text
+                style={{ textAlign: 'center', color: 'white', lineHeight: 100 }}
+              >
+                Pressd
+              </Text>
+            );
+          } else {
+            return (
+              <Text style={{ textAlign: 'center', color: 'white' }}>
+                Press Me
+              </Text>
+            );
+          }
+        }}
+      </Pressable>
     </View>
   );
 }
@@ -49,28 +59,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#F5FCFF',
   },
-  touchableStyle: {
-    width: 300,
-    height: 38,
-    borderRadius: 5,
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#06C1AE',
-    marginTop: 20,
-    marginBottom: 20,
+  pressdStyle: {
+    backgroundColor: 'rgb(210, 230, 255)',
+    height: 100,
+    lineHeight: '100',
   },
-  txtStyle: {
-    color: '#ffffff',
-    textAlign: 'center',
-    fontSize: 18,
-  },
-  countText: {
-    marginTop: 10,
-    alignSelf: 'center',
-    fontSize: 38,
-    color: '#06C1AE',
+  unPressdStyle: {
+    backgroundColor: '#ccc',
   },
 });
