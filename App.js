@@ -1,71 +1,102 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  View,
+  FlatList,
+  Dimensions,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  StatusBar,
+  SafeAreaView,
+} from 'react-native';
+import { queryMovies } from './data/service';
+import MovieItemCell from './MovieItemCell';
+export const width = Dimensions.get('window').width;
+import React, { useEffect, useState } from 'react';
+const App = () => {
+  // 初始化电影数据
+  const data = queryMovies();
+  // 初始化电影列表和加载状态
+  const [movieList, setMovieList] = useState([]);
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    setTimeout(() => {
+      setMovieList(data);
+      setLoaded(true);
+    }, 1000);
+  }, []);
 
-export default function App() {
-  function onPressHandle() {
-    console.log('onPressHandle');
+  // 渲染标题
+  function renderTitle() {
+    return (
+      <View style={styles.bayStyle}>
+        <Text style={styles.txtStyle}>电影列表</Text>
+      </View>
+    );
   }
 
-  function onPressOutHandle() {
-    console.log('onPressOutHandle');
+  // 渲染加载条
+  function renderLoad() {
+    if (!loaded) {
+      return (
+        <View style={styles.container}>
+          <ActivityIndicator animating={true} size='small' />
+          <Text style={{ color: '#666666', paddingLeft: 10 }}>努力加载中</Text>
+        </View>
+      );
+    }
   }
 
-  function onPressInHandle() {
-    console.log('onPressInHandle');
+  // 渲染电影列表
+  function renderList() {
+    return (
+      <FlatList
+        data={movieList}
+        renderItem={({ item }) => (
+          <MovieItemCell
+            movie={item}
+            onPress={() => {
+              alert('点击的电影名称:' + item.title);
+            }}
+          />
+        )}
+        keyExtractor={item => item.id}
+      />
+    );
   }
 
-  function onLongPressHandle() {
-    console.log('onLongPressHandle');
-  }
   return (
-    <View style={styles.container}>
-      <Pressable
-        style={({ pressed }) => {
-          if (pressed) {
-            return styles.pressdStyle;
-          } else {
-            return styles.unPressdStyle;
-          }
-        }}
-        hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
-        onPress={onPressHandle}
-        onPressIn={onPressInHandle}
-        onPressOut={onPressOutHandle}
-        onLongPress={onLongPressHandle}
-      >
-        {({ pressed }) => {
-          // 根据是否点按返回不同的子组件
-          if (pressed) {
-            return (
-              <Text
-                style={{ textAlign: 'center', color: 'white', lineHeight: 100 }}
-              >
-                Pressd
-              </Text>
-            );
-          } else {
-            return (
-              <Text style={{ textAlign: 'center', color: 'white' }}>
-                Press Me
-              </Text>
-            );
-          }
-        }}
-      </Pressable>
+    <View style={styles.flex}>
+      {renderTitle()}
+      {renderLoad()}
+      {renderList()}
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+    backgroundColor: '#268dcd',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
+    flexDirection: 'row',
   },
-  pressdStyle: {
-    backgroundColor: 'rgb(210, 230, 255)',
-    height: 100,
-    lineHeight: '100',
+  bayStyle: {
+    height: 58,
+    marginTop: 40,
+    width: width,
+    justifyContent: 'center',
+    backgroundColor: '#268dcd',
   },
-  unPressdStyle: {
-    backgroundColor: '#ccc',
+  txtStyle: {
+    color: '#fff',
+    textAlign: 'center',
+    fontSize: 18,
   },
 });
+
+export default App;
