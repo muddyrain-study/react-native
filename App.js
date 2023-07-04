@@ -8,9 +8,14 @@ import {
   StatusBar,
   SafeAreaView,
 } from 'react-native';
-import { queryMovies } from './data/service';
+import { queryMovies, randomRefreshMovies } from './data/service';
 import MovieItemCell from './MovieItemCell';
+import moviesData from './data/movies.json';
 export const width = Dimensions.get('window').width;
+let currentPage = 1;
+let pageSize = 10;
+let totalPage = Math.ceil(moviesData.length / pageSize);
+
 import React, { useEffect, useState } from 'react';
 const App = () => {
   // 初始化电影数据
@@ -18,6 +23,10 @@ const App = () => {
   // 初始化电影列表和加载状态
   const [movieList, setMovieList] = useState([]);
   const [loaded, setLoaded] = useState(false);
+
+  const [isHeaderRefreshing, setIsHeaderRefreshing] = useState(false);
+  const [isFooterRefreshing, setIsFooterRefreshing] = useState(false);
+
   useEffect(() => {
     setTimeout(() => {
       setMovieList(data);
@@ -46,6 +55,33 @@ const App = () => {
     }
   }
 
+  // 下拉刷新
+
+  function beginHeaderRefreshing() {
+    console.log('下拉刷新了');
+    setIsHeaderRefreshing(true);
+    const newMovie = randomRefreshMovies();
+    const data = [...newMovie, ...movieList];
+    setTimeout(() => {
+      setMovieList(data);
+      setIsHeaderRefreshing(false);
+    }, 1000);
+  }
+  // 上拉加载
+  function beginFooterRefreshing() {
+    console.log('上拉加载了');
+    setIsFooterRefreshing(true);
+    if (currentPage < totalPage) {
+      currentPage++;
+      const newMovie = queryMovies(currentPage, pageSize).slice();
+      const data = [...movieList, ...newMovie];
+      setTimeout(() => {
+        setMovieList(data);
+        setIsFooterRefreshing(false);
+      }, 1000);
+    }
+  }
+
   // 渲染电影列表
   function renderList() {
     return (
@@ -59,16 +95,36 @@ const App = () => {
             }}
           />
         )}
-        keyExtractor={item => item.id}
+        refreshing={isHeaderRefreshing}
+        onRefresh={beginHeaderRefreshing}
+        onEndReached={beginFooterRefreshing}
+        onEndReachedThreshold={0.5}
+        keyExtractor={item =>
+          item.id + new Date().getTime() + Math.floor(Math.random() * 100)
+        }
       />
     );
   }
-
+  function renderFooterLoad() {
+    return (
+      <>
+        {isFooterRefreshing && (
+          <View style={styles.footerStyle}>
+            <ActivityIndicator animating={true} size='small' />
+            <Text style={{ color: '#666666', paddingLeft: 10 }}>
+              努力加载中
+            </Text>
+          </View>
+        )}
+      </>
+    );
+  }
   return (
     <View style={styles.flex}>
       {renderTitle()}
       {renderLoad()}
       {renderList()}
+      {renderFooterLoad()}
     </View>
   );
 };
@@ -96,6 +152,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     fontSize: 18,
+  },
+  footerStyle: {
+    height: 64,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
   },
 });
 
