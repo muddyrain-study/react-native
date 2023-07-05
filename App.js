@@ -1,94 +1,75 @@
-import React, { useState } from 'react';
-import {
-  Button,
-  Platform,
-  SafeAreaView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import React, { PureComponent } from 'react';
 
-const STYLES = ['default', 'dark-content', 'light-content'];
-const TRANSITIONS = ['fade', 'slide', 'none'];
+import { Pressable, StyleSheet, Text, View, Dimensions } from 'react-native';
+import FreeDialog from './components/FreeDialog';
 
-const App = () => {
-  const [hidden, setHidden] = useState(false);
-  const [statusBarStyle, setStatusBarStyle] = useState(STYLES[0]);
-  const [statusBarTransition, setStatusBarTransition] = useState(
-    TRANSITIONS[0]
-  );
+const { width } = Dimensions.get('window');
 
-  const changeStatusBarVisibility = () => setHidden(!hidden);
-
-  const changeStatusBarStyle = () => {
-    const styleId = STYLES.indexOf(statusBarStyle) + 1;
-    if (styleId === STYLES.length) {
-      setStatusBarStyle(STYLES[0]);
-    } else {
-      setStatusBarStyle(STYLES[styleId]);
-    }
-  };
-
-  const changeStatusBarTransition = () => {
-    const transition = TRANSITIONS.indexOf(statusBarTransition) + 1;
-    if (transition === TRANSITIONS.length) {
-      setStatusBarTransition(TRANSITIONS[0]);
-    } else {
-      setStatusBarTransition(TRANSITIONS[transition]);
-    }
-  };
-
-  return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar
-        animated={true}
-        backgroundColor='#61dafb'
-        barStyle={statusBarStyle}
-        showHideTransition={statusBarTransition}
-        hidden={hidden}
+export default class App extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isShowDialog: false,
+    };
+  }
+  showDialog() {
+    this.setState({
+      isShowDialog: true,
+    });
+  }
+  renderDialog() {
+    return (
+      <FreeDialog
+        isShow={this.state.isShowDialog}
+        title={'年底大促'}
+        content={'您的新年礼品,请尽快领取'}
+        buttonContent={'领取新年礼物'}
+        imageSource={require('./assets/dialog_bg.png')}
+        closeDialog={() => {
+          this.setState({
+            isShowDialog: false,
+          });
+        }}
       />
-      <Text style={styles.textStyle}>
-        StatusBar Visibility:{'\n'}
-        {hidden ? 'Hidden' : 'Visible'}
-      </Text>
-      <Text style={styles.textStyle}>
-        StatusBar Style:{'\n'}
-        {statusBarStyle}
-      </Text>
-      {Platform.OS === 'ios' ? (
-        <Text style={styles.textStyle}>
-          StatusBar Transition:{'\n'}
-          {statusBarTransition}
-        </Text>
-      ) : null}
-      <View style={styles.buttonsContainer}>
-        <Button title='Toggle StatusBar' onPress={changeStatusBarVisibility} />
-        <Button title='Change StatusBar Style' onPress={changeStatusBarStyle} />
-        {Platform.OS === 'ios' ? (
-          <Button
-            title='Change StatusBar Transition'
-            onPress={changeStatusBarTransition}
-          />
-        ) : null}
+    );
+  }
+  render() {
+    return (
+      <View style={styles.container}>
+        <Pressable
+          style={styles.btnContainer}
+          onPress={() => {
+            this.showDialog();
+          }}
+        >
+          <Text style={styles.textStyle}>点击弹出框</Text>
+        </Pressable>
+        {this.renderDialog()}
       </View>
-    </SafeAreaView>
-  );
-};
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#ECF0F1',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
   },
-  buttonsContainer: {
-    padding: 10,
+  btnContainer: {
+    marginTop: 15,
+    marginLeft: 10,
+    marginRight: 10,
+    backgroundColor: '#EE7942',
+    height: 38,
+    width: width - 100,
+    borderRadius: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   textStyle: {
-    textAlign: 'center',
-    marginBottom: 8,
+    color: '#ffffff',
+    fontSize: 18,
   },
 });
-
-export default App;
