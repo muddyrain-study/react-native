@@ -1,67 +1,18 @@
-import { useRef, useState } from 'react';
-import { View, Text, StyleSheet, PanResponder, Animated } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import HomeScreen from './views/HomeScreen';
+import DetailScreen from './views/DetailScreen';
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
-  const pan = useRef(new Animated.ValueXY()).current;
-  const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => {
-      pan.setOffset({
-        x: pan.x._value,
-        y: pan.y._value,
-      });
-      return true;
-    },
-    onPanResponderMove: Animated.event(
-      [
-        null,
-        {
-          dx: pan.x,
-          dy: pan.y,
-        },
-      ],
-      { useNativeDriver: false }
-    ),
-    onPanResponderRelease(e, gs) {
-      pan.flattenOffset();
-      Animated.spring(pan, {
-        toValue: { x: 0, y: 0 },
-        useNativeDriver: false,
-      }).start();
-    },
-  });
   return (
-    <View style={styles.container}>
-      <Animated.View
-        style={[
-          styles.box,
-          {
-            transform: [
-              {
-                translateX: pan.x,
-              },
-              {
-                translateY: pan.y,
-              },
-            ],
-          },
-        ]}
-        {...panResponder.panHandlers}
-      ></Animated.View>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen name='首页' component={HomeScreen} />
+        <Stack.Screen name='Detail' component={DetailScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  box: {
-    backgroundColor: '#61dafb',
-    width: 80,
-    height: 80,
-    borderRadius: 4,
-  },
-});
