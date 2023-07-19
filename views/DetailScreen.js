@@ -4,7 +4,7 @@ export default DetailScreen = ({ navigation, route }) => {
   const [postContent, setPostContent] = useState('');
   const pressHandle = () => {
     navigation.navigate({
-      name: 'home',
+      name: 'Home',
       params: {
         post: postContent,
       },

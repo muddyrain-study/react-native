@@ -1,11 +1,18 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import HomeScreen from './views/HomeScreen';
+import SettingScreen from './views/SettingScreen';
+import ProfileScreen from './views/ProfileScreen';
 import DetailScreen from './views/DetailScreen';
 import { Image, Text, View } from 'react-native';
 
-const Stack = createNativeStackNavigator();
+// 创建一个堆栈导航器
+const HomeStack = createNativeStackNavigator();
+const SettingStack = createNativeStackNavigator();
+// 创建一个底部导航器
+const Tab = createBottomTabNavigator();
 
 function LogoTitle() {
   return (
@@ -22,7 +29,25 @@ function LogoTitle() {
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator
+      <Tab.Navigator screenOptions={{ headerShown: false }}>
+        <Tab.Screen name='First'>
+          {() => (
+            <HomeStack.Navigator>
+              <HomeStack.Screen name='Home' component={HomeScreen} />
+              <HomeStack.Screen name='Detail' component={DetailScreen} />
+            </HomeStack.Navigator>
+          )}
+        </Tab.Screen>
+        <Tab.Screen name='Second'>
+          {() => (
+            <SettingStack.Navigator>
+              <SettingStack.Screen name='Setting' component={SettingScreen} />
+              <SettingStack.Screen name='Profile' component={ProfileScreen} />
+            </SettingStack.Navigator>
+          )}
+        </Tab.Screen>
+      </Tab.Navigator>
+      {/* <Stack.Navigator
         screenOptions={{
           headerStyle: {
             backgroundColor: '#f4511e',
@@ -41,7 +66,7 @@ export default function App() {
           options={({ route }) => ({ title: route.params?.name + '详情' })}
           component={DetailScreen}
         />
-      </Stack.Navigator>
+      </Stack.Navigator> */}
     </NavigationContainer>
   );
 }
